@@ -1,4 +1,3 @@
 #NAME X             Y             Z             SEFDR SEFDL FR_PAR_ANGLE FR_ELEV_ANGLE FR_OFFSET[d] DR_RE   DR_IM   DL_RE    DL_IM
 ALMA  2225061.164  -5440057.37   -2481681.15    90    90    1            0             0            0       0       0        0
-moon 0 0 0 10000 10000 0 0 0 0 0 0 0
 SEL2 0 0 0 10000 10000 0 0 0 0 0 0 0

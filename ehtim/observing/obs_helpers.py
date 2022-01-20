@@ -143,7 +143,6 @@ def compute_uv_coordinates(array, site1, site2, time, mjd, ra, dec, rf, timetype
                 c1 = np.array(FUNCDICT[site1space](Time_now))
             coord1space.append(c1)
         coord1space = np.array(coord1space)
-        # coord1[spacemask1] = coord1space
 
     # use spacecraft ephemeris to get position of site 2
     spacemask2 = [np.all(coord == (0., 0., 0.)) for coord in coord2]
@@ -184,10 +183,6 @@ def compute_uv_coordinates(array, site1, site2, time, mjd, ra, dec, rf, timetype
                 c2 = np.array(FUNCDICT[site2space](Time_now))
             coord2space.append(c2)
         coord2space = np.array(coord2space)
-        # coord2[spacemask2] = coord2space
-
-    # coord1[spacemask1] = coord1space
-    # coord2[spacemask2] = coord2space
 
     # rotate the station coordinates with the earth
     coord1 = earthrot(coord1, theta)

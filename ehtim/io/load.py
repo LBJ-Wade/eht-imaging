@@ -825,7 +825,7 @@ def load_array_txt(filename, ephemdir='ephemeris'):
     tdataout = np.array(tdataout)
     edata = {}
     for line in tdataout:
-        if np.all(np.array([line['x'],line['y'],line['z']]) == (0.,0.,0.)):
+        if np.all(np.array([line['x'],line['y'],line['z']]) == (0.,0.,0.)) or np.all(np.isnan(np.array([line['x'],line['y'],line['z']]))):
             sitename = str(line['site'])
             ephempath = path  + '/' + ephemdir + '/' + sitename #TODO ephempath shouldn't always start with path
             try:
