@@ -34,6 +34,7 @@ except ImportError:
 
 import astropy.time as at
 import astropy.coordinates as coords
+import astropy.units as units
 import numpy as np
 import itertools as it
 import scipy.ndimage as nd
@@ -131,6 +132,7 @@ def compute_uv_coordinates(array, site1, site2, time, mjd, ra, dec, rf, timetype
                 # pyephem doesn't use an ellipsoid earth model!
                 c1 = coords.EarthLocation.from_geodetic(lon, lat, elev, ellipsoid=None)
                 c1 = np.array((c1.x.value, c1.y.value, c1.z.value))
+                c1 = earthrot(c1, theta_now)
             #if using an anstropy solar system body
             elif array.ephem[site1space] == -1:
                 sat = coords.get_body(site1space, Time_now, EARTHCORE)
@@ -171,17 +173,21 @@ def compute_uv_coordinates(array, site1, site2, time, mjd, ra, dec, rf, timetype
                 # pyephem doesn't use an ellipsoid earth model!
                 c2 = coords.EarthLocation.from_geodetic(lon, lat, elev, ellipsoid=None)
                 c2 = np.array((c2.x.value, c2.y.value, c2.z.value))
+                c2 = earthrot(c2,theta_now)
             #if using an astropy solar system body
-        elif array.ephem[site2space] == -1:
-            sat=coords.get_body(site2space, Time_now, EARTHCORE)
-            c2 = sat.represent_as('cartesian')
-            c2 = np.array((c2.x.to_value(units.m), c2.y.to_value(units.m), c2.z.to_value(units.m)))
+            elif array.ephem[site2space] == -1:
+                sat=coords.get_body(site2space, Time_now, EARTHCORE)
+                c2 = sat.represent_as('cartesian')
+                c2 = np.array((c2.x.to_value(units.m), c2.y.to_value(units.m), c2.z.to_value(units.m)))
+            #if using a supported custom object in SSLOCS
+            else:
+                c2 = np.array(FUNCDICT[site2space](Time_now))
             coord2space.append(c2)
-        #if using a supported custom object in SSLOCS
-        else:
-            c2 = np.array(FUNCDICT[site2space](Time_now))
         coord2space = np.array(coord2space)
         # coord2[spacemask2] = coord2space
+
+    # coord1[spacemask1] = coord1space
+    # coord2[spacemask2] = coord2space
 
     # rotate the station coordinates with the earth
     coord1 = earthrot(coord1, theta)
@@ -189,9 +195,9 @@ def compute_uv_coordinates(array, site1, site2, time, mjd, ra, dec, rf, timetype
 
     #substitute in space coordinates
     if np.any(spacemask1):
-        coord1[spacemask1] = np.array(coord1space)
+        coord1[spacemask1] = coord1space.squeeze()
     if np.any(spacemask2):
-        coord2[spacemask2] = np.array(coord2space)
+        coord2[spacemask2] = coord2space.squeeze()
 
 
     # u,v coordinates

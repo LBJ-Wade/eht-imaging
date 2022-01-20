@@ -42,6 +42,8 @@ import ehtim.observing
 import ehtim.io.oifits
 import ehtim.const_def as ehc
 
+from astropy.coordinates import solar_system_ephemeris
+
 import warnings
 warnings.filterwarnings("ignore", message="Mean of empty slice")
 warnings.filterwarnings("ignore", message="invalid value encountered in true_divide")
@@ -823,16 +825,22 @@ def load_array_txt(filename, ephemdir='ephemeris'):
     tdataout = np.array(tdataout)
     edata = {}
     for line in tdataout:
-        if np.all(np.array([line['x'], line['y'], line['z']]) == (0., 0., 0.)):
+        if np.all(np.array([line['x'],line['y'],line['z']]) == (0.,0.,0.)):
             sitename = str(line['site'])
-            # TODO ephempath shouldn't always start with path
-            ephempath = path + '/' + ephemdir + '/' + sitename
+            ephempath = path  + '/' + ephemdir + '/' + sitename #TODO ephempath shouldn't always start with path
             try:
-                edata[sitename] = np.loadtxt(ephempath, dtype=bytes,
-                                             comments='#', delimiter='/').astype(str)
+                edata[sitename] = np.loadtxt(ephempath, dtype=bytes, comments='#', delimiter='/').astype(str)
                 print('loaded spacecraft ephemeris %s' % ephempath)
             except IOError:
-                raise Exception('no ephemeris file %s !' % ephempath)
+                if sitename in solar_system_ephemeris.bodies:
+                    edata[sitename] = -1
+                    print("Using solar system ephemeris")
+                elif sitename in ehc.SSLOCS:
+                    edata[sitename] = -2
+                    print("Using location computed from solar system ephemeris")
+                else:
+                    raise Exception ('no ephemeris file %s or not a recognized object! ' % ephempath)
+
 
     return ehtim.array.Array(tdataout, ephem=edata)
 
