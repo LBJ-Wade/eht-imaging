@@ -69,6 +69,10 @@ GRIDDER_CONV_FUNC_DEFAULT = 'gaussian'
 FFT_PAD_DEFAULT = 2
 FFT_INTERP_DEFAULT = 3
 
+# List of special solar system locations
+SSLOCS = ['EML1','EML2',
+          'SEL1','SEL2']
+
 # Observation recarray datatypes
 DTARR = [('site', 'U32'), ('x', 'f8'), ('y', 'f8'), ('z', 'f8'),
          ('sefdr', 'f8'), ('sefdl', 'f8'), ('dr', 'c16'), ('dl', 'c16'),
